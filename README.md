@@ -163,4 +163,4 @@ lxc file push rancher-cluster.yml kub-1/home/kubeadm/
 ```
 $ cat lxc-rke.sh|lxc exec kub-1 bash
 ```
-
+rke log is generate at kub-1:/tmp/rke.log
