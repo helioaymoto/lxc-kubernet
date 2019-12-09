@@ -1,15 +1,16 @@
-# lxc-kubernet
+# lxc-kubernet Cluster
 Kubernet Cluster running in a LXD/LXC containers
 
 ## About this project
-This is a way to setup a Kubernet Cluster running in a single computer for testing propose.
+This is a way to setup a Kubernet Cluster running in a single computer where it has 3 LXD/LXC containers + Kubernet Cluster. This is a good option for test propose.
 
 ## Some Observation about this project
-1) The host OS has to be Ubuntu (I am running Ubuntu Ubuntu 18.04.3 LTS)... Unfortunatelly, I could not get this project working on Centos 7.
+1) The host OS has to be Ubuntu (I am running Ubuntu Ubuntu 18.04.3 LTS)... Unfortunatelly, I could not get this project working on Centos 7 host. At this time, Centos 8 is released but it´s missing some packages to allow LXD instalation via snap.
 2) The LXD/LXC containers can be Ubuntu or Centos 7... In this one I am assuming Centos 7
 3) LXD has to be installed via snap (via yum does not work... I think because of the lxd version)
-4) For kubernet 1.15 above, it´s required some worked around after the containers setup
-5) At this time, the Kubernet version is v1.16.3... I cannot garantee it will work for later releases
+4) LXD storage cannot be ZFS, because there is some incompatibility between Kubernet docker instalation.
+5) For kubernet 1.15 above, it´s required some worked around after the containers setup (you can see in the LXC Container at /etc/rc.local)
+6) At this time, the Kubernet version is v1.16.3... I cannot garantee it will work for later releases
 
 ## Step by Step to build
 1) Install HOST OS (Ubuntu 18.04)
@@ -21,7 +22,7 @@ I have used virtual Box, but vmware should be fine too.
 $ sudo systemctl enable --now snapd
 $ sudo snap install lxd
 $ sudo usermod -a -G lxd <username>   This allow normal user to run lxd/lxc
-$ lxd init   (default configuration should be fine... I am using zfs storage)
+$ lxd init   (default configuration should be fine)
 ```
 3) Create a Kubernet specific Profile
 ```
@@ -48,7 +49,19 @@ devices:
     type: disk
 name: k8s
 ```
-4) You might want to have public IP for the LXC containers to have direct access to your network, so you can create an additional LXC profile to allow the container to have a second NIC
+4) Create a LXD Storage based on directory (dir). 
+```
+$ lxc storage create directory dir
+$ lxc storage list
++-----------+-------------+--------+--------------------------------------------------+---------+
+|   NAME    | DESCRIPTION | DRIVER |                      SOURCE                      | USED BY |
++-----------+-------------+--------+--------------------------------------------------+---------+
+| default   |             | zfs    | lxd-pool                                         | 2       |
++-----------+-------------+--------+--------------------------------------------------+---------+
+| directory |             | dir    | /var/snap/lxd/common/lxd/storage-pools/directory | 6       |
++-----------+-------------+--------+--------------------------------------------------+---------+
+```
+5) You might want to have public IP for the LXC containers to have direct access to your network, so you can create an additional LXC profile to allow the container to have a second NIC
 ```
 You need to create a bridge interface called bridge0 attached to you NIC, so you have to create the followin bridge profile
 $ lxc profile show bridgeprofile
@@ -79,7 +92,7 @@ $ lxc profile list
 | k8sprofile    | 0       |
 +---------------+---------+
 ```
-5) Clone this project
+6) Clone this project
 ```
 git clone https://github.com/helioaymoto/lxc-kubernet.git
 ```
@@ -88,7 +101,7 @@ create.sh: to create the LXC containers
 lxc-docker.sh: to install some packages, users and docker
 lxc-rke.sh to install kubernet using rke
 
-6) Create 3 LXC containers (CENTOS 7) using create.sh script
+7) Create 3 LXC containers (CENTOS 7) using create.sh script
 ```
 $ ./create.sh kub-1 192.168.1.191
 *** Starting LXD/LXC Container creation for Kubernet ***
@@ -141,12 +154,12 @@ $ lxc list
 +-------+---------+-----------------------+----------------------------------------------+------------+-----------+
 ```
 
-7) Copy rke config file to kub-1
+8) Copy rke config file to kub-1
 ```
 lxc file push rancher-cluster.yml kub-1/home/kubeadm/
 ```
 
-8) Install kubernet with rke
+9) Install kubernet with rke
 ```
 cat lxc-rke.sh|lxc exec kub-1 bash
 ```
