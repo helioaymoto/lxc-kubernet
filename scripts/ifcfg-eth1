@@ -1,0 +1,4 @@
+DEVICE=eth1
+BOOTPROTO=none
+ONBOOT=yes
+PREFIX=24

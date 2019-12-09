@@ -1,0 +1,22 @@
+nodes:
+  - address: 192.168.1.191
+    user: kubeadm
+    role: [controlplane,worker,etcd]
+  - address: 192.168.1.192
+    user: kubeadm
+    role: [controlplane,worker,etcd]
+  - address: 192.168.1.193
+    user: kubeadm
+    role: [controlplane,worker,etcd]
+
+network:
+    plugin: flannel
+
+services:
+  etcd:
+    snapshot: true
+    creation: 6h
+    retention: 24h
+  kubelet:
+    extra_binds:
+      - /mnt:/mnt:rshared

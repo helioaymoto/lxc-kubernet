@@ -79,3 +79,75 @@ $ lxc profile list
 | k8sprofile    | 0       |
 +---------------+---------+
 ```
+5) Clone this project
+```
+git clone https://github.com/helioaymoto/lxc-kubernet.git
+```
+These are 3 scripts to help to setup the enviroment
+create.sh: to create the LXC containers
+lxc-docker.sh: to install some packages, users and docker
+lxc-rke.sh to install kubernet using rke
+
+6) Create 3 LXC containers (CENTOS 7) using create.sh script
+```
+$ ./create.sh kub-1 192.168.1.191
+*** Starting LXD/LXC Container creation for Kubernet ***
+[1/6] Starting creating LXD/LXC Containers
+[2/6] Configuring public IP
+[3/6] Configuring user
+      Waiting network connectivity
+[4/6] Installing net-tools openssh-server sshpass wget
+[5/6] Installing docker
+[6/6] Configuring workaround
+*** Finished LXD/LXC Container creation for Kubernet ***
+$ ./create.sh kub-2 192.168.1.192
+*** Starting LXD/LXC Container creation for Kubernet ***
+[1/6] Starting creating LXD/LXC Containers
+[2/6] Configuring public IP
+[3/6] Configuring user
+      Waiting network connectivity
+[4/6] Installing net-tools openssh-server sshpass wget
+[5/6] Installing docker
+[6/6] Configuring workaround
+*** Finished LXD/LXC Container creation for Kubernet ***
+$ ./create.sh kub-3 192.168.1.193
+*** Starting LXD/LXC Container creation for Kubernet ***
+[1/6] Starting creating LXD/LXC Containers
+[2/6] Configuring public IP
+[3/6] Configuring user
+      Waiting network connectivity
+[4/6] Installing net-tools openssh-server sshpass wget
+[5/6] Installing docker
+[6/6] Configuring workaround
+*** Finished LXD/LXC Container creation for Kubernet ***
+```
+You should have 3 LXC containers with eth0 and eth1 NICs, where eth0 is the private/internal network and eth1 is the public network attached to the bridge in your network.
+```
+$ lxc list
++-------+---------+-----------------------+----------------------------------------------+------------+-----------+
+| NAME  |  STATE  |         IPV4          |                     IPV6                     |    TYPE    | SNAPSHOTS |
++-------+---------+-----------------------+----------------------------------------------+------------+-----------+
+| kub-1 | RUNNING | 192.168.1.191 (eth1)  | fd42:ab9e:be3:ae98:216:3eff:fee8:f1a2 (eth0) | PERSISTENT | 0         |
+|       |         | 172.17.0.1 (docker0)  |                                              |            |           |
+|       |         | 10.133.122.128 (eth0) |                                              |            |           |
++-------+---------+-----------------------+----------------------------------------------+------------+-----------+
+| kub-2 | RUNNING | 192.168.1.192 (eth1)  | fd42:ab9e:be3:ae98:216:3eff:fe04:521a (eth0) | PERSISTENT | 0         |
+|       |         | 172.17.0.1 (docker0)  |                                              |            |           |
+|       |         | 10.133.122.250 (eth0) |                                              |            |           |
++-------+---------+-----------------------+----------------------------------------------+------------+-----------+
+| kub-3 | RUNNING | 192.168.1.193 (eth1)  | fd42:ab9e:be3:ae98:216:3eff:fe9e:31d3 (eth0) | PERSISTENT | 0         |
+|       |         | 172.17.0.1 (docker0)  |                                              |            |           |
+|       |         | 10.133.122.79 (eth0)  |                                              |            |           |
++-------+---------+-----------------------+----------------------------------------------+------------+-----------+
+```
+
+7) Copy rke config file to kub-1
+```
+lxc file push rancher-cluster.yml kub-1/home/kubeadm/
+```
+
+8) Install kubernet with rke
+```
+cat lxc-rke.sh|lxc exec kub-1 bash
+```
+
