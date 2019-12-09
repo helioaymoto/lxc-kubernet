@@ -161,6 +161,6 @@ lxc file push rancher-cluster.yml kub-1/home/kubeadm/
 
 9) Install kubernet with rke
 ```
-cat lxc-rke.sh|lxc exec kub-1 bash
+$ cat lxc-rke.sh|lxc exec kub-1 bash
 ```
 
