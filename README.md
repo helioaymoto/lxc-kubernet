@@ -61,7 +61,7 @@ $ lxc storage list
 | directory |             | dir    | /var/snap/lxd/common/lxd/storage-pools/directory | 6       |
 +-----------+-------------+--------+--------------------------------------------------+---------+
 ```
-5) You might want to have public IP for the LXC containers to have direct access to your network, so you can create an additional LXC profile to allow the container to have a second NIC
+5) You might want to have public IP for the LXC containers to have direct access to your network, so you can create an additional LXC profile to allow the container to have a second NIC. If you are running the host LXD in a Virtual Box virtual machine then you have to have the NIC configured as "PCnet-FAST III" insted the default one (Intel PRO/1000 variant) and the NIC in "Promiscuous mode".
 ```
 You need to create a bridge interface called bridge0 attached to you NIC, so you have to create the followin bridge profile
 $ lxc profile show bridgeprofile
